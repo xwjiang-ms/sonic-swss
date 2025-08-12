@@ -36,14 +36,18 @@ resources:
     endpoint: sonic-net
   - repository: buildimage
     type: github
-    name: sonic-net/sonic-buildimage
+    name: xwjiang-ms/sonic-buildimage
     endpoint: sonic-net
-    ref: master
+    ref: remove_remote_import_template
 
 parameters:
   - name: debian_version
     type: string
     default: bookworm
+
+  - name: CHECKOUT_SONIC_MGMT
+    type: boolean
+    default: true
 
 variables:
   - template: .azure-pipelines/azure-pipelines-repd-build-variables.yml@buildimage
@@ -189,7 +193,7 @@ stages:
       SUBMODULE: sonic-swss
       COMMIT_ID: $(Build.SourceVersion)
 
-- stage: Build
+- stage: BuildImage
   pool: sonicbld-1es
   dependsOn: []
   jobs:
@@ -223,7 +227,7 @@ stages:
       SUBMODULE: sonic-swss
       COMMIT_ID: $(Build.SourceVersion)
 
-- stage: Test
+- stage: KVMTest
   dependsOn: BuildVS
   condition: and(succeeded(), and(ne(stageDependencies.BuildVS.outputs['vs.SetVar.SKIP_VSTEST'], 'YES'), in(dependencies.BuildVS.result, 'Succeeded', 'SucceededWithIssues')))
   variables:
@@ -235,3 +239,5 @@ stages:
 
   jobs:
     - template: .azure-pipelines/pr_test_template.yml@sonic-mgmt
+      parameters:
+        CHECKOUT_SONIC_MGMT: ${{ parameters.CHECKOUT_SONIC_MGMT }}
