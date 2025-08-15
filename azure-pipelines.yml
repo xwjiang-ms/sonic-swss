@@ -184,8 +184,7 @@ stages:
   pool: sonicbld-1es
   dependsOn: []
   jobs:
-  - job: BuildImage
-    steps:
+  - steps:
     - checkout: buildimage
     - template: .azure-pipelines/azure-pipelines-build.yml@buildimage
       parameters:
@@ -219,8 +218,7 @@ stages:
   pool: sonicbld-1es
   dependsOn: []
   jobs:
-  - job: BuildVS
-    steps:
+  - steps:
     - checkout: buildimage
     - template: .azure-pipelines/azure-pipelines-build.yml@buildimage
       parameters:
