@@ -213,7 +213,7 @@ stages:
           INCLUDE_RESTAPI: y
       SUBMODULE: sonic-swss
       COMMIT_ID: $(Build.SourceVersion)
-      REMOTE_URL: $(System.PullRequest.SourceRepositoryUri)
+      SUBMODULE_PR_ID: $(System.PullRequest.PullRequestId)
       REMOTE_BRANCH: $(System.PullRequest.SourceBranch)
 
 - stage: BuildVS
@@ -227,7 +227,7 @@ stages:
       - name: vs
       SUBMODULE: sonic-swss
       COMMIT_ID: $(Build.SourceVersion)
-      REMOTE_URL: $(System.PullRequest.SourceRepositoryUri)
+      SUBMODULE_PR_ID: $(System.PullRequest.PullRequestId)
       REMOTE_BRANCH: $(System.PullRequest.SourceBranch)
 
 - stage: KVMTest
