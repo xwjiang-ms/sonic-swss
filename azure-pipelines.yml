@@ -211,6 +211,10 @@ stages:
           PLATFORM_NAME: marvell-prestera
           PLATFORM_ARCH: armhf
           INCLUDE_RESTAPI: y
+      SUBMODULE: sonic-swss
+      COMMIT_ID: $(Build.SourceVersion)
+      REMOTE_URL: $(System.PullRequest.SourceRepositoryUri)
+      REMOTE_BRANCH: $(System.PullRequest.SourceBranch)
 
 - stage: BuildVS
   pool: sonicbld-1es
@@ -223,6 +227,8 @@ stages:
       - name: vs
       SUBMODULE: sonic-swss
       COMMIT_ID: $(Build.SourceVersion)
+      REMOTE_URL: $(System.PullRequest.SourceRepositoryUri)
+      REMOTE_BRANCH: $(System.PullRequest.SourceBranch)
 
 - stage: KVMTest
   dependsOn: BuildVS
