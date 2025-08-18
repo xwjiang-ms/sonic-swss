@@ -63,6 +63,16 @@ variables:
     value: y
 
 stages:
+- stage: PrintEnv
+  jobs:
+  - job: PrintEnv
+    pool: sonicbld-1es
+    steps:
+    - script: |
+        echo "Printing all variables:"
+        printenv
+      displayName: 'Print Environment Variables'
+
 - stage: Build
 
   jobs:
