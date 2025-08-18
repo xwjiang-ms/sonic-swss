@@ -56,7 +56,7 @@ variables:
     ${{ else }}:
       value: $(Build.SourceBranchName)
   - name: PULL_REQUEST_ID
-    value: $(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)
+    value: $(System.PullRequest.PullRequestNumber)
   - name: CACHE_MODE
     value: rcache
   - name: ENABLE_FIPS
