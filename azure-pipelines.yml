@@ -212,7 +212,6 @@ stages:
           PLATFORM_ARCH: armhf
           INCLUDE_RESTAPI: y
       SUBMODULE: sonic-swss
-      COMMIT_ID: $(Build.SourceVersion)
       SUBMODULE_PR_ID: $(System.PullRequest.PullRequestId)
 
 - stage: BuildVS
@@ -225,7 +224,6 @@ stages:
       jobGroups:
       - name: vs
       SUBMODULE: sonic-swss
-      COMMIT_ID: $(Build.SourceVersion)
       SUBMODULE_PR_ID: $(System.PullRequest.PullRequestId)
 
 - stage: KVMTest
