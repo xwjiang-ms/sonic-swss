@@ -212,7 +212,7 @@ stages:
           PLATFORM_ARCH: armhf
           INCLUDE_RESTAPI: y
       SUBMODULE: sonic-swss
-      SUBMODULE_PR_ID: $(System.PullRequest.PullRequestId)
+      SUBMODULE_PR_ID: $SYSTEM_PULLREQUEST_PULLREQUESTNUMBER
 
 - stage: BuildVS
   pool: sonicbld-1es
@@ -224,7 +224,7 @@ stages:
       jobGroups:
       - name: vs
       SUBMODULE: sonic-swss
-      SUBMODULE_PR_ID: $(System.PullRequest.PullRequestId)
+      SUBMODULE_PR_ID: $SYSTEM_PULLREQUEST_PULLREQUESTNUMBER
 
 - stage: KVMTest
   dependsOn: BuildVS
