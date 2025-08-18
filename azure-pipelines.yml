@@ -56,23 +56,13 @@ variables:
     ${{ else }}:
       value: $(Build.SourceBranchName)
   - name: PULL_REQUEST_ID
-    value: $(System.PullRequest.PullRequestId)
+    value: $(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)
   - name: CACHE_MODE
     value: rcache
   - name: ENABLE_FIPS
     value: y
 
 stages:
-- stage: PrintEnv
-  jobs:
-  - job: PrintEnv
-    pool: sonicbld-1es
-    steps:
-    - script: |
-        echo "Printing all variables:"
-        printenv
-      displayName: 'Print Environment Variables'
-
 - stage: Build
 
   jobs:
