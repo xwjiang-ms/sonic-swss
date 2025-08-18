@@ -55,6 +55,8 @@ variables:
       value: $(System.PullRequest.TargetBranch)
     ${{ else }}:
       value: $(Build.SourceBranchName)
+  - name: PULL_REQUEST_ID
+    value: $(System.PullRequest.PullRequestId)
   - name: CACHE_MODE
     value: rcache
   - name: ENABLE_FIPS
@@ -212,7 +214,7 @@ stages:
           PLATFORM_ARCH: armhf
           INCLUDE_RESTAPI: y
       SUBMODULE: sonic-swss
-      SUBMODULE_PR_ID: $(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)
+      SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
 
 - stage: BuildVS
   pool: sonicbld-1es
@@ -224,7 +226,7 @@ stages:
       jobGroups:
       - name: vs
       SUBMODULE: sonic-swss
-      SUBMODULE_PR_ID: $(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)
+      SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
 
 - stage: KVMTest
   dependsOn: BuildVS
