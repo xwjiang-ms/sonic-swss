@@ -214,7 +214,6 @@ stages:
       SUBMODULE: sonic-swss
       COMMIT_ID: $(Build.SourceVersion)
       SUBMODULE_PR_ID: $(System.PullRequest.PullRequestId)
-      SUBMODULE_BRANCH: $(System.PullRequest.SourceBranch)
 
 - stage: BuildVS
   pool: sonicbld-1es
@@ -228,7 +227,6 @@ stages:
       SUBMODULE: sonic-swss
       COMMIT_ID: $(Build.SourceVersion)
       SUBMODULE_PR_ID: $(System.PullRequest.PullRequestId)
-      SUBMODULE_BRANCH: $(System.PullRequest.SourceBranch)
 
 - stage: KVMTest
   dependsOn: BuildVS
