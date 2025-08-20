@@ -183,6 +183,7 @@ stages:
       archive_gcov: true
 
 - stage: BuildImageAndTest
+  pool: sonicbld-1es
   dependsOn: []
   variables:
   - group: SONiC-Elastictest
