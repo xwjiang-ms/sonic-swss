@@ -190,11 +190,12 @@ stages:
   jobs:
   - job: BuildImageAndTest
     steps:
-    - task: PowerShell@2
+    - task: AzureCLI@2
       inputs:
-        targetType: inline
-        script: |
-          echo "Queueing buildimage pipeline..."
+        azureSubscription: "SONiC-Automation"
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
           az pipelines run \
             --org "$(SONIC_ORG)" \
             --project "$(BUILD_IMG_PROJECT)" \
