@@ -199,7 +199,9 @@ stages:
             --project "$(BUILD_IMG_PROJECT)" \
             --id "$(BUILD_IMG_PIPELINE_ID)" \
             --branch "$(BUILD_BRANCH)" \
-            --parameters "SUBMODULE=sonic-swss, SUBMODULE_PR_ID=$(PULL_REQUEST_ID)"
+            --parameters SUBMODULE=sonic-swss \
+            --parameters SUBMODULE_PR_ID=$(PULL_REQUEST_ID) \
+            --debug
 
 
 # - stage: BuildImage
