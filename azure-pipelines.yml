@@ -217,9 +217,8 @@ stages:
             PLATFORM_NAME: marvell-prestera
             PLATFORM_ARCH: armhf
             INCLUDE_RESTAPI: y
-        SUBMODULE: ${{ parameters.SUBMODULE }}
-        COMMIT_ID: ${{ parameters.COMMIT_ID }}
-        SUBMODULE_PR_ID: ${{ parameters.SUBMODULE_PR_ID }}
+        SUBMODULE: sonic-swss
+        SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
 
 - stage: BuildVSImage
   pool: sonicbld-1es
@@ -240,9 +239,8 @@ stages:
         buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) BUILD_MULTIASIC_KVM=y INCLUDE_DHCP_SERVER=y ${{ variables.VERSION_CONTROL_OPTIONS }}'
         jobGroups:
         - name: vs
-        SUBMODULE: ${{ parameters.SUBMODULE }}
-        COMMIT_ID: ${{ parameters.COMMIT_ID }}
-        SUBMODULE_PR_ID: ${{ parameters.SUBMODULE_PR_ID }}
+        SUBMODULE: sonic-swss
+        SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
 
   - job: get_impacted_area
     displayName: "Get impacted area"
@@ -262,7 +260,6 @@ stages:
     condition: contains(dependencies.get_impacted_area.outputs['SetVariableTask.PR_CHECKERS'], 't0_checker')
     variables:
       TEST_SCRIPTS: $[ dependencies.get_impacted_area.outputs['SetVariableTask.TEST_SCRIPTS'] ]
-    timeoutInMinutes: ${{ parameters.TIMEOUT_IN_MINUTES_PR_TEST }}
     continueOnError: false
     pool: sonic-ubuntu-1c
     steps:
