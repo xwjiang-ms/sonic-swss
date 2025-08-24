@@ -30,7 +30,7 @@ parameters:
   default: ''
 
 jobs:
-- template: azure-pipelines-image-template.yml@buildimage
+- template: .azure-pipelines/azure-pipelines-image-template.yml@buildimage
   parameters:
     jobFilters: ${{ parameters.jobFilters }}
     preSteps: ${{ parameters.preSteps }}
