@@ -186,39 +186,35 @@ stages:
   pool: sonicbld-1es
   dependsOn: []
   jobs:
-  - job: BuildImage
-    steps:
-    - checkout: buildimage
-      path: buildimage
-    - template: .azure-pipelines/azure-pipelines-build.yml@buildimage
-      parameters:
-        buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) ${{ variables.VERSION_CONTROL_OPTIONS }}'
-        jobGroups:
-        - name: broadcom
-          variables:
-            swi_image: yes
-            docker_syncd_rpc_image: yes
-            platform_rpc: brcm
-            INCLUDE_RESTAPI: y
-        - name: mellanox
-          variables:
-            dbg_image: yes
-            docker_syncd_rpc_image: yes
-            platform_rpc: mlnx
-        - name: marvell-prestera-arm64
-          pool: sonicbld-arm64
-          variables:
-            PLATFORM_NAME: marvell-prestera
-            PLATFORM_ARCH: arm64
-        - name: marvell-prestera-armhf
-          pool: sonicbld-armhf
-          timeoutInMinutes: 1200
-          variables:
-            PLATFORM_NAME: marvell-prestera
-            PLATFORM_ARCH: armhf
-            INCLUDE_RESTAPI: y
-        SUBMODULE: sonic-swss
-        SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
+  - template: .azure-pipelines/azure-pipelines-build.yml
+    parameters:
+      buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) ${{ variables.VERSION_CONTROL_OPTIONS }}'
+      jobGroups:
+      - name: broadcom
+        variables:
+          swi_image: yes
+          docker_syncd_rpc_image: yes
+          platform_rpc: brcm
+          INCLUDE_RESTAPI: y
+      - name: mellanox
+        variables:
+          dbg_image: yes
+          docker_syncd_rpc_image: yes
+          platform_rpc: mlnx
+      - name: marvell-prestera-arm64
+        pool: sonicbld-arm64
+        variables:
+          PLATFORM_NAME: marvell-prestera
+          PLATFORM_ARCH: arm64
+      - name: marvell-prestera-armhf
+        pool: sonicbld-armhf
+        timeoutInMinutes: 1200
+        variables:
+          PLATFORM_NAME: marvell-prestera
+          PLATFORM_ARCH: armhf
+          INCLUDE_RESTAPI: y
+      SUBMODULE: sonic-swss
+      SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
 
 - stage: BuildVSImage
   pool: sonicbld-1es
@@ -230,17 +226,13 @@ stages:
   - name: testbed_file
     value: vtestbed.csv
   jobs:
-  - job: BuildImage
-    steps:
-    - checkout: buildimage
-      path: buildimage
-    - template: .azure-pipelines/azure-pipelines-build.yml@buildimage
-      parameters:
-        buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) BUILD_MULTIASIC_KVM=y INCLUDE_DHCP_SERVER=y ${{ variables.VERSION_CONTROL_OPTIONS }}'
-        jobGroups:
-        - name: vs
-        SUBMODULE: sonic-swss
-        SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
+  - template: .azure-pipelines/azure-pipelines-build.yml@buildimage
+    parameters:
+      buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) BUILD_MULTIASIC_KVM=y INCLUDE_DHCP_SERVER=y ${{ variables.VERSION_CONTROL_OPTIONS }}'
+      jobGroups:
+      - name: vs
+      SUBMODULE: sonic-swss
+      SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
 
   - job: get_impacted_area
     displayName: "Get impacted area"
