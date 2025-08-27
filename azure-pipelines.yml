@@ -196,6 +196,8 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
           az pipelines run \
             --org "$(SONIC_ORG)" \
             --project "$(BUILD_IMG_PROJECT)" \
