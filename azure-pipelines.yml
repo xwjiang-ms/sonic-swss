@@ -196,23 +196,20 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
-          echo $AZURE_DEVOPS_EXT_PAT | az devops login --organization "$(SONIC_ORG)"
-
-          az pipelines show \
-            --id "$(BUILD_IMG_PIPELINE_ID)" \
-            --org "$(SONIC_ORG)" \
-            --project "$(BUILD_IMG_PROJECT)"
-
-          az pipelines run \
-            --org "$(SONIC_ORG)" \
-            --project "$(BUILD_IMG_PROJECT)" \
-            --id "$(BUILD_IMG_PIPELINE_ID)" \
-            --branch "$(BUILD_BRANCH)" \
-            --debug
-      env:
-        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+          echo "Triggering buildimage pipeline..."
+          curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $(System.AccessToken)" \
+            -d '{
+                  "resources": {
+                    "repositories": {
+                      "self": {
+                        "refName": "refs/heads/$(BUILD_BRANCH)"
+                      }
+                    }
+                  }
+                }' \
+            "$(SONIC_ORG)/$(BUILD_IMG_PROJECT)/_apis/pipelines/$(BUILD_IMG_PIPELINE_ID)/runs?api-version=7.1-preview.1"
 
 
 # --parameters SUBMODULE=sonic-swss \
