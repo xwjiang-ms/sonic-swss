@@ -61,6 +61,8 @@ variables:
     value: rcache
   - name: ENABLE_FIPS
     value: y
+  - name: AZURE_DEVOPS_EXT_PAT
+    value: $(System.AccessToken)
 
 stages:
 - stage: Build
@@ -210,8 +212,6 @@ stages:
                   }
                 }' \
             "$(SONIC_ORG)/$(BUILD_IMG_PROJECT)/_apis/pipelines/$(BUILD_IMG_PIPELINE_ID)/runs?api-version=7.1-preview.1"
-      env:
-        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
 # --parameters SUBMODULE=sonic-swss \
 # --parameters SUBMODULE_PR_ID=$(PULL_REQUEST_ID) \
