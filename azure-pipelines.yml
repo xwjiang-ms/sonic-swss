@@ -193,7 +193,7 @@ stages:
     steps:
     - task: AzureCLI@2
       inputs:
-        azureSubscription: "SONiC-Automation"
+        azureSubscription: "sonic2subs"
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
