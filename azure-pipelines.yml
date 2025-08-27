@@ -36,9 +36,9 @@ resources:
     endpoint: sonic-net
   - repository: buildimage
     type: github
-    name: xwjiang-ms/sonic-buildimage
+    name: sonic-net/sonic-buildimage
+    ref: master
     endpoint: sonic-net
-    ref: remove_remote_import_template
 
 parameters:
   - name: debian_version
@@ -182,94 +182,122 @@ stages:
       artifact_name: sonic-gcov
       archive_gcov: true
 
-- stage: BuildImage
-  pool: sonicbld-1es
-  dependsOn: []
-  jobs:
-  - template: .azure-pipelines/azure-pipelines-build.yml
-    parameters:
-      buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) ${{ variables.VERSION_CONTROL_OPTIONS }}'
-      jobGroups:
-      - name: broadcom
-        variables:
-          swi_image: yes
-          docker_syncd_rpc_image: yes
-          platform_rpc: brcm
-          INCLUDE_RESTAPI: y
-      - name: mellanox
-        variables:
-          dbg_image: yes
-          docker_syncd_rpc_image: yes
-          platform_rpc: mlnx
-      - name: marvell-prestera-arm64
-        pool: sonicbld-arm64
-        variables:
-          PLATFORM_NAME: marvell-prestera
-          PLATFORM_ARCH: arm64
-      - name: marvell-prestera-armhf
-        pool: sonicbld-armhf
-        timeoutInMinutes: 1200
-        variables:
-          PLATFORM_NAME: marvell-prestera
-          PLATFORM_ARCH: armhf
-          INCLUDE_RESTAPI: y
-      SUBMODULE: sonic-swss
-      SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
 
-- stage: BuildVSImage
+- stage: BuildImageAndTest
   pool: sonicbld-1es
   dependsOn: []
   variables:
   - group: SONiC-Elastictest
-  - name: inventory
-    value: veos_vtb
-  - name: testbed_file
-    value: vtestbed.csv
   jobs:
-  - template: .azure-pipelines/azure-pipelines-build.yml@buildimage
-    parameters:
-      buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) BUILD_MULTIASIC_KVM=y INCLUDE_DHCP_SERVER=y ${{ variables.VERSION_CONTROL_OPTIONS }}'
-      jobGroups:
-      - name: vs
-      SUBMODULE: sonic-swss
-      SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
-
-  - job: get_impacted_area
-    displayName: "Get impacted area"
-    timeoutInMinutes: 10
-    continueOnError: false
-    pool: sonic-ubuntu-1c
+  - job: BuildImageAndTest
     steps:
-      - checkout: sonic-mgmt
-      - template: .azure-pipelines/impacted_area_testing/get-impacted-area.yml@sonic-mgmt
-        parameters:
-          BUILD_BRANCH: $(BUILD_BRANCH)
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: "SONiC-Automation"
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az pipelines run \
+            --org "$(SONIC_ORG)" \
+            --project "$(BUILD_IMG_PROJECT)" \
+            --id "$(BUILD_IMG_PIPELINE_ID)" \
+            --branch "$(BUILD_BRANCH)" \
+            --debug
 
-  - job: impacted_area_t0_elastictest
-    displayName: "impacted-area-kvmtest-t0 by Elastictest"
-    dependsOn:
-      - get_impacted_area
-    condition: contains(dependencies.get_impacted_area.outputs['SetVariableTask.PR_CHECKERS'], 't0_checker')
-    variables:
-      TEST_SCRIPTS: $[ dependencies.get_impacted_area.outputs['SetVariableTask.TEST_SCRIPTS'] ]
-    continueOnError: false
-    pool: sonic-ubuntu-1c
-    steps:
-      - checkout: sonic-mgmt
-      - template: .azure-pipelines/impacted_area_testing/calculate-instance-numbers.yml@sonic-mgmt
-        parameters:
-          TOPOLOGY: t0
-          BUILD_BRANCH: $(BUILD_BRANCH)
+# --parameters SUBMODULE=sonic-swss \
+# --parameters SUBMODULE_PR_ID=$(PULL_REQUEST_ID) \
+###############################################################################
 
-      - template: .azure-pipelines/run-test-elastictest-template.yml@sonic-mgmt
-        parameters:
-          TOPOLOGY: t0
-          SCRIPTS: $(SCRIPTS)
-          MIN_WORKER: $(INSTANCE_NUMBER)
-          MAX_WORKER: $(INSTANCE_NUMBER)
-          KVM_IMAGE_BRANCH: $(BUILD_BRANCH)
-          MGMT_BRANCH: $(BUILD_BRANCH)
-          COMMON_EXTRA_PARAMS: "--disable_sai_validation "
+# - stage: BuildImage
+#   pool: sonicbld-1es
+#   dependsOn: []
+#   jobs:
+#   - template: .azure-pipelines/azure-pipelines-build.yml
+#     parameters:
+#       buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) ${{ variables.VERSION_CONTROL_OPTIONS }}'
+#       jobGroups:
+#       - name: broadcom
+#         variables:
+#           swi_image: yes
+#           docker_syncd_rpc_image: yes
+#           platform_rpc: brcm
+#           INCLUDE_RESTAPI: y
+#       - name: mellanox
+#         variables:
+#           dbg_image: yes
+#           docker_syncd_rpc_image: yes
+#           platform_rpc: mlnx
+#       - name: marvell-prestera-arm64
+#         pool: sonicbld-arm64
+#         variables:
+#           PLATFORM_NAME: marvell-prestera
+#           PLATFORM_ARCH: arm64
+#       - name: marvell-prestera-armhf
+#         pool: sonicbld-armhf
+#         timeoutInMinutes: 1200
+#         variables:
+#           PLATFORM_NAME: marvell-prestera
+#           PLATFORM_ARCH: armhf
+#           INCLUDE_RESTAPI: y
+#       SUBMODULE: sonic-swss
+#       SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
+
+# - stage: BuildVSImage
+#   pool: sonicbld-1es
+#   dependsOn: []
+#   variables:
+#   - group: SONiC-Elastictest
+#   - name: inventory
+#     value: veos_vtb
+#   - name: testbed_file
+#     value: vtestbed.csv
+#   jobs:
+#   - template: .azure-pipelines/azure-pipelines-build.yml@buildimage
+#     parameters:
+#       buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) BUILD_MULTIASIC_KVM=y INCLUDE_DHCP_SERVER=y ${{ variables.VERSION_CONTROL_OPTIONS }}'
+#       jobGroups:
+#       - name: vs
+#       SUBMODULE: sonic-swss
+#       SUBMODULE_PR_ID: ${{ variables.PULL_REQUEST_ID }}
+
+#   - job: get_impacted_area
+#     displayName: "Get impacted area"
+#     timeoutInMinutes: 10
+#     continueOnError: false
+#     pool: sonic-ubuntu-1c
+#     steps:
+#       - checkout: sonic-mgmt
+#       - template: .azure-pipelines/impacted_area_testing/get-impacted-area.yml@sonic-mgmt
+#         parameters:
+#           BUILD_BRANCH: $(BUILD_BRANCH)
+
+#   - job: impacted_area_t0_elastictest
+#     displayName: "impacted-area-kvmtest-t0 by Elastictest"
+#     dependsOn:
+#       - get_impacted_area
+#     condition: contains(dependencies.get_impacted_area.outputs['SetVariableTask.PR_CHECKERS'], 't0_checker')
+#     variables:
+#       TEST_SCRIPTS: $[ dependencies.get_impacted_area.outputs['SetVariableTask.TEST_SCRIPTS'] ]
+#     continueOnError: false
+#     pool: sonic-ubuntu-1c
+#     steps:
+#       - checkout: sonic-mgmt
+#       - template: .azure-pipelines/impacted_area_testing/calculate-instance-numbers.yml@sonic-mgmt
+#         parameters:
+#           TOPOLOGY: t0
+#           BUILD_BRANCH: $(BUILD_BRANCH)
+
+#       - template: .azure-pipelines/run-test-elastictest-template.yml@sonic-mgmt
+#         parameters:
+#           TOPOLOGY: t0
+#           SCRIPTS: $(SCRIPTS)
+#           MIN_WORKER: $(INSTANCE_NUMBER)
+#           MAX_WORKER: $(INSTANCE_NUMBER)
+#           KVM_IMAGE_BRANCH: $(BUILD_BRANCH)
+#           MGMT_BRANCH: $(BUILD_BRANCH)
+#           COMMON_EXTRA_PARAMS: "--disable_sai_validation "
+
+######################################################################################
 
 # - stage: BuildImageAndTest
 #   pool: sonicbld-1es
@@ -294,6 +322,8 @@ stages:
 #             --parameters SUBMODULE_PR_ID=$(PULL_REQUEST_ID) \
 #             --debug
 
+#     env:
+#       AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
 # - stage: BuildImage
 #   pool: sonicbld-1es
