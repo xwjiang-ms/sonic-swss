@@ -199,7 +199,7 @@ stages:
           echo "Triggering buildimage pipeline..."
           curl -s -X POST \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $(System.AccessToken)" \
+            -H "Authorization: Bearer $(AZURE_DEVOPS_EXT_PAT)" \
             -d '{
                   "resources": {
                     "repositories": {
@@ -210,7 +210,8 @@ stages:
                   }
                 }' \
             "$(SONIC_ORG)/$(BUILD_IMG_PROJECT)/_apis/pipelines/$(BUILD_IMG_PIPELINE_ID)/runs?api-version=7.1-preview.1"
-
+      env:
+        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
 
 # --parameters SUBMODULE=sonic-swss \
 # --parameters SUBMODULE_PR_ID=$(PULL_REQUEST_ID) \
