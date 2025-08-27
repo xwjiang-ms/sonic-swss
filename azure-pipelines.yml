@@ -191,18 +191,20 @@ stages:
   jobs:
   - job: BuildImageAndTest
     steps:
-    - task: AzureCLI@2
+    - task: Bash@3
+      displayName: Trigger buidimage pipeline
       inputs:
-        azureSubscription: "sonic2subs"
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
+        targetType: 'inline'
+        script: |
           az pipelines run \
             --org "$(SONIC_ORG)" \
             --project "$(BUILD_IMG_PROJECT)" \
             --id "$(BUILD_IMG_PIPELINE_ID)" \
             --branch "$(BUILD_BRANCH)" \
             --debug
+      env:
+        AZURE_DEVOPS_EXT_PAT: $(System.AccessToken)
+
 
 # --parameters SUBMODULE=sonic-swss \
 # --parameters SUBMODULE_PR_ID=$(PULL_REQUEST_ID) \
